@@ -175,7 +175,8 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
         $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       }
       $result = $mailer->send($toEmail, $headers, $message);
-      
+      Civi::log()->notice(print_r(['mandrill result' => $result], 1));
+
       if (version_compare('4.5alpha1', $civiVersion) > 0) {
         CRM_Core_Error::setCallback();
       }
