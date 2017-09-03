@@ -51,7 +51,7 @@ class CRM_Mte_BAO_Mandrill extends CRM_Core_DAO {
   }
 
   /*
-   * function to process mandill call backs
+   * Process Mandrill callbacks.
    *
    * @access public
    * @static
@@ -255,7 +255,8 @@ WHERE cc.is_deleted = 0 AND cc.is_deceased = 0 AND cgc.group_id = {$mailingBacke
     }
   }
   
-  /* Function to retrieve email details of sender and to
+  /**
+   * Retrieve email details of sender and to.
    * 
    * @access public
    * @static

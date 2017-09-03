@@ -400,7 +400,6 @@ function mte_civicrm_buildForm($formName, &$form) {
  *
  */
 function mte_checkSettings($context) {
-  
   $usedFor = 1;
   if ($context == 'civimail') {
     $usedFor = 2;
