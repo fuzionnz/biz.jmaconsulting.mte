@@ -35,7 +35,11 @@ class CRM_Mte_BAO_Mandrill extends CRM_Core_DAO {
    */
   private static $_contacts;
 
-  
+  public static $_mailTypes = array(
+    'transactional' => 1,
+    'civimail' => 2,
+  );
+
   /**
    * static cache to hold Activity id for bulk mailing
    * @var array

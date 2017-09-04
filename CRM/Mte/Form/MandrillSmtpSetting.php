@@ -54,10 +54,11 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
 
     $this->add('submit', $this->_testButtonName, ts('Save & Send Test Email'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
-    $options = array(
-      'Transactional Emails' => 1,
-      'CiviMail Bulk Mailings' => 2
-    );
+
+    foreach (CRM_Mte_BAO_Mandrill::$_mailTypes as $label => $value) {
+      $options[$label] = $value;
+    }
+
     $this->addCheckBox('used_for', ts('Used For?'), $options,
       NULL, NULL, NULL, NULL,
       array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>') 

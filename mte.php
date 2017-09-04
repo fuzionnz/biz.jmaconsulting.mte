@@ -294,7 +294,15 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
       $activityParams['source_record_id'] = CRM_Core_DAO::getFieldValue($jobCLassName, $params['job_id'], 'mailing_id');
     }
   }
+
+  $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'mandrill_smtp_settings');
+  if (in_array(CRM_Mte_BAO_Mandrill::$_mailTypes[$context], $mailingBackend['activities_for'])) {
+    Civi::log()->debug('settings: ' . print_r($mailingBackend, 1));
+    Civi::log()->debug('context: ' . print_r($context, 1));
+    Civi::log()->debug('types: ' . print_r(CRM_Mte_BAO_Mandrill::$_mailTypes, 1));
+  }
   $result = civicrm_api('activity', 'create', $activityParams);
+
   if(CRM_Utils_Array::value('id', $result)){
     $params['activityId'] = $mandrillHeader = $result['id'];
     // include verp in header incase of bulk mailing
@@ -315,10 +323,6 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
       mte_getmailer($mailer);
     }
   }
-
-  $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mandrill_smtp_settings'
-  );
 
   if (! empty($mailingBackend['subaccount'])) {
     $params['headers']['X-MC-Subaccount'] = $mailingBackend['subaccount'];
