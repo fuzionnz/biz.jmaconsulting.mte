@@ -83,6 +83,11 @@ There are two types of emails sent from CiviCRM: bulk emails sent through the Ci
                 <span class="description">{ts}{/ts}</span>
             </td>
         </tr>
+        <tr class="crm-smtp-form-block-activity_includes_mail_body">
+            <td class="label">{$form.activity_includes_mail_body.label}</td>
+            <td>{$form.activity_includes_mail_body.html}<br />
+            </td>
+        </tr>
        <tr class="crm-smtp-form-block-enable">
          <td class="label">{$form.is_active.label}</td>
          <td>{$form.is_active.html}<br />

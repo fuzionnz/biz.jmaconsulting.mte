@@ -296,10 +296,18 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
   }
 
   $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'mandrill_smtp_settings');
+  if (isset($mailingBackend['activity_includes_mail_body']) && $mailingBackend['activity_includes_mail_body']) {
+    $activityParams['details'] = CRM_Utils_Array::value('html', $params, $params['text']);
+  }
+
+  // This is WIP towards disabling Activity generation, but needs
+  // further work to store the Mandrill-CiviCRM relations in a
+  // different manner before it can proceed? See
+  // https://github.com/JMAConsulting/biz.jmaconsulting.mte/issues/110
   if (in_array(CRM_Mte_BAO_Mandrill::$_mailTypes[$context], $mailingBackend['activities_for'])) {
-    Civi::log()->debug('settings: ' . print_r($mailingBackend, 1));
-    Civi::log()->debug('context: ' . print_r($context, 1));
-    Civi::log()->debug('types: ' . print_r(CRM_Mte_BAO_Mandrill::$_mailTypes, 1));
+    //Civi::log()->debug('settings: ' . print_r($mailingBackend, 1));
+    //Civi::log()->debug('context: ' . print_r($context, 1));
+    //Civi::log()->debug('types: ' . print_r(CRM_Mte_BAO_Mandrill::$_mailTypes, 1));
   }
   $result = civicrm_api('activity', 'create', $activityParams);
 

@@ -67,6 +67,7 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
       NULL, NULL, NULL, NULL,
       array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
     );
+    $this->add('checkbox', 'activity_includes_mail_body', ts('Save email body to Activities?'));
 
     $element = $this->add('text', 'mandril_post_url', ts('Mandrill Post to URL'));
     $element->freeze();

@@ -407,9 +407,17 @@ WHERE cc.is_deleted = 0 AND cc.is_deceased = 0 AND cgc.group_id = {$mailingBacke
       'version' => 3,
       'target_contact_id' => array_unique($emails['contactIds']),
       'source_record_id' => CRM_Utils_Array::value('mailing_id', $value),
-      'details' => CRM_Utils_Array::value('mail_body', $value),
+      'details' => null,
     );
-    
+
+    $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+     'mandrill_smtp_settings'
+    );
+    Civi::log()->debug(print_r(['$mailingBackend' => $mailingBackend], 1));
+    if (false) {
+      $activityParams['details'] = CRM_Utils_Array::value('mail_body', $value);
+    }
+
     if (CRM_Utils_Array::value('assignee_contact_id', $value)) {
       $activityParams['assignee_contact_id'] = array_unique($value['assignee_contact_id']);
     }
