@@ -71,12 +71,18 @@ There are two types of emails sent from CiviCRM: bulk emails sent through the Ci
            <div class="description">{ts 1='target="_blank" href="https://mandrill.zendesk.com/hc/en-us/sections/200775487-Subaccounts-Basics"'}Optional <a %1>Mandrill Subaccount</a>. Useful when managing a common Mandrill account for different CiviCRM instances.{/ts}</div>
          </td>
        </tr>
-       <tr class="crm-smtp-form-block-used_for">
-         <td class="label">{$form.used_for.label}</td>
-         <td>{$form.used_for.html}<br />
-         <span class="description">{ts}{/ts}</span>
-         </td>
-       </tr>
+        <tr class="crm-smtp-form-block-used_for">
+            <td class="label">{$form.used_for.label}</td>
+            <td>{$form.used_for.html}<br />
+                <span class="description">{ts}{/ts}</span>
+            </td>
+        </tr>
+        <tr class="crm-smtp-form-block-activities_for">
+            <td class="label">{$form.activities_for.label}</td>
+            <td>{$form.activities_for.html}<br />
+                <span class="description">{ts}{/ts}</span>
+            </td>
+        </tr>
        <tr class="crm-smtp-form-block-enable">
          <td class="label">{$form.is_active.label}</td>
          <td>{$form.is_active.html}<br />

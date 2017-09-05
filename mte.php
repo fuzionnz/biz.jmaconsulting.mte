@@ -294,7 +294,15 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
       $activityParams['source_record_id'] = CRM_Core_DAO::getFieldValue($jobCLassName, $params['job_id'], 'mailing_id');
     }
   }
+
+  $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'mandrill_smtp_settings');
+  if (in_array(CRM_Mte_BAO_Mandrill::$_mailTypes[$context], $mailingBackend['activities_for'])) {
+    Civi::log()->debug('settings: ' . print_r($mailingBackend, 1));
+    Civi::log()->debug('context: ' . print_r($context, 1));
+    Civi::log()->debug('types: ' . print_r(CRM_Mte_BAO_Mandrill::$_mailTypes, 1));
+  }
   $result = civicrm_api('activity', 'create', $activityParams);
+
   if(CRM_Utils_Array::value('id', $result)){
     $params['activityId'] = $mandrillHeader = $result['id'];
     // include verp in header incase of bulk mailing
@@ -315,10 +323,6 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
       mte_getmailer($mailer);
     }
   }
-
-  $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mandrill_smtp_settings'
-  );
 
   if (! empty($mailingBackend['subaccount'])) {
     $params['headers']['X-MC-Subaccount'] = $mailingBackend['subaccount'];
@@ -400,7 +404,6 @@ function mte_civicrm_buildForm($formName, &$form) {
  *
  */
 function mte_checkSettings($context) {
-  
   $usedFor = 1;
   if ($context == 'civimail') {
     $usedFor = 2;
@@ -562,7 +565,27 @@ function mte_createQueue(&$mandrillHeader, $toEmail) {
  * Implementation of hook_civicrm_postEmailSend
  */
 function mte_civicrm_postEmailSend(&$params) {
+  static $activities_for = array();
+  Civi::log()->debug(print_r($params, 1));
   if (!empty($params['mandrillHeader'])) {
+    // This is mte_checkSettings().
+//      $usedFor = 1;
+//      if ($context == 'civimail') {
+//          $usedFor = 2;
+//      }
+//
+//      $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+//        'mandrill_smtp_settings'
+//      );
+//
+//      if (CRM_Utils_array::value('is_active', $mailingBackend) &&
+//        array_key_exists('used_for', $mailingBackend)
+//        && !empty($mailingBackend['used_for'][$usedFor])
+//      ) {
+//          return TRUE;
+//      }
+//      return FALSE;
+
     $header = explode(CRM_Core_Config::singleton()->verpSeparator, $params['mandrillHeader']);
     $params = array(
       'job_id' => $header[2],

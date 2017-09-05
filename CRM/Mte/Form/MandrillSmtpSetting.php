@@ -54,15 +54,20 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
 
     $this->add('submit', $this->_testButtonName, ts('Save & Send Test Email'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
-    $options = array(
-      'Transactional Emails' => 1,
-      'CiviMail Bulk Mailings' => 2
-    );
+
+    foreach (CRM_Mte_BAO_Mandrill::$_mailTypes as $label => $value) {
+      $options[$label] = $value;
+    }
+
     $this->addCheckBox('used_for', ts('Used For?'), $options,
       NULL, NULL, NULL, NULL,
       array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>') 
     );
-    
+    $this->addCheckBox('activities_for', ts('Record Activities for?'), $options,
+      NULL, NULL, NULL, NULL,
+      array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
+    );
+
     $element = $this->add('text', 'mandril_post_url', ts('Mandrill Post to URL'));
     $element->freeze();
     
@@ -171,7 +176,8 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
         $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       }
       $result = $mailer->send($toEmail, $headers, $message);
-      
+      Civi::log()->notice(print_r(['mandrill result' => $result], 1));
+
       if (version_compare('4.5alpha1', $civiVersion) > 0) {
         CRM_Core_Error::setCallback();
       }
