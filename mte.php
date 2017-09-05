@@ -492,7 +492,7 @@ function mte_civicrm_alterReportVar($varType, &$var, &$object) {
             'type' => 1,
             'title' => ts('Opened Count'),
           );
-          $var->_select .= ' , count(DISTINCT(civicrm_mailing_event_opened.id)) as opened_count';
+          $var->_select .= ' , count(DISTINCT(mailing_event_opened_civireport.id)) as opened_count';
           $var->_groupBy = ' GROUP BY civicrm_mailing_event_queue.id';
         }
       }
