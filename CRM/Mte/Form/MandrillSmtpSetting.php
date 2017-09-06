@@ -1,29 +1,29 @@
 <?php
 /**
- * Mandrill Transactional Email extension integrates CiviCRM's non-bulk email 
+ * Mandrill Transactional Email extension integrates CiviCRM's non-bulk email
  * with the Mandrill service
- * 
+ *
  * Copyright (C) 2012-2015 JMA Consulting
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Support: https://github.com/JMAConsulting/biz.jmaconsulting.mte/issues
- * 
+ *
  * Contact: info@jmaconsulting.biz
  *          JMA Consulting
  *          215 Spadina Ave, Ste 400
- *          Toronto, ON  
+ *          Toronto, ON
  *          Canada   M5T 2C7
  */
 
@@ -35,7 +35,7 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
-  
+
   protected $_testButtonName;
 
   /**
@@ -61,7 +61,7 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
 
     $this->addCheckBox('used_for', ts('Used For?'), $options,
       NULL, NULL, NULL, NULL,
-      array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>') 
+      array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
     );
     $this->addCheckBox('activities_for', ts('Record Activities for?'), $options,
       NULL, NULL, NULL, NULL,
@@ -70,13 +70,13 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
 
     $element = $this->add('text', 'mandril_post_url', ts('Mandrill Post to URL'));
     $element->freeze();
-    
+
     // add select for groups
     $this->add('select', 'group_id', ts('Group to notify'), array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group());
     $this->addFormRule(array('CRM_Mte_Form_MandrillSmtpSetting', 'formRule'));
     parent::buildQuickForm();
   }
-  
+
   /**
    * global validation rules for the form
    *
@@ -97,7 +97,7 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
     }
     return empty($errors) ? TRUE : $errors;
   }
-  
+
   /**
    * Process the form submission.
    */
@@ -108,31 +108,31 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
       list($toDisplayName, $toEmail, $toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
-      
+
       //get the default domain email address.CRM-4250
       list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
-      
+
       if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
         $fixUrl = CRM_Utils_System::url("civicrm/admin/domain", 'action=update&reset=1');
         CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', array(1 => $fixUrl)));
       }
-      
+
       if (!$toEmail) {
         CRM_Core_Error::statusBounce(ts('Cannot send a test email because your user record does not have a valid email address.'));
       }
-      
+
       if (!trim($toDisplayName)) {
         $toDisplayName = $toEmail;
       }
-      
+
       $testMailStatusMsg = ts('Sending test email. FROM: %1 TO: %2.<br />', array(1 => $domainEmailAddress, 2 => $toEmail));
-      
+
       $params = array();
       $message = "SMTP settings are correct.";
-      
+
       $params['host'] = $formValues['smtpServer'];
       $params['port'] = $formValues['smtpPort'];
-      
+
       if ($formValues['smtpAuth']) {
         $params['username'] = $formValues['smtpUsername'];
         $params['password'] = $formValues['smtpPassword'];
@@ -145,22 +145,22 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
       if (! empty($formValues['subaccount'])) {
         $params['subaccount']['headers'] = $formValues['subaccount'];
       }
-      
+
       // set the localhost value, CRM-3153, CRM-9332
       $params['localhost'] = $_SERVER['SERVER_NAME'];
-      
+
       // also set the timeout value, lets set it to 30 seconds
       // CRM-7510, CRM-9332
       $params['timeout'] = 30;
-      
+
       $mailerName = 'smtp';
-      
+
       $headers = array(
         'From' => '"' . $domainEmailName . '" <' . $domainEmailAddress . '>',
         'To' => '"' . $toDisplayName . '"' . "<$toEmail>",
         'Subject' => "Test for SMTP settings",
       );
-      
+
       $mailer = Mail::factory($mailerName, $params);
       $config = CRM_Core_Config::singleton();
       if (property_exists($config, 'civiVersion')) {
@@ -192,7 +192,7 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
         CRM_Core_Session::setStatus($testMailStatusMsg . ts('Oops. Your %1 settings are incorrect. No test mail has been sent.', array(1 => strtoupper($mailerName))) . $message, ts("Mail Not Sent"), "error");
       }
     }
-        
+
     // if password is present, encrypt it
     if (!empty($formValues['smtpPassword'])) {
       $formValues['smtpPassword'] = CRM_Utils_Crypt::encrypt($formValues['smtpPassword']);
@@ -220,13 +220,13 @@ class CRM_Mte_Form_MandrillSmtpSetting extends CRM_Admin_Form_Setting {
       );
       if (!empty($mailingBackend)) {
         $this->_defaults = $mailingBackend;
-        
+
         if (!empty($this->_defaults['smtpPassword'])) {
           $this->_defaults['smtpPassword'] = CRM_Utils_Crypt::decrypt($this->_defaults['smtpPassword']);
         }
       }
       $mandrillSecret = CRM_Core_OptionGroup::values('mandrill_secret', TRUE);
-      $this->_defaults['mandril_post_url'] = CRM_Utils_System::url('civicrm/ajax/mte/callback', 
+      $this->_defaults['mandril_post_url'] = CRM_Utils_System::url('civicrm/ajax/mte/callback',
         "mandrillSecret={$mandrillSecret['Secret Code']}", TRUE, NULL, FALSE, TRUE);
     }
     return $this->_defaults;

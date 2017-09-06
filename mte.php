@@ -1,29 +1,29 @@
 <?php
 /**
- * Mandrill Transactional Email extension integrates CiviCRM's non-bulk email 
+ * Mandrill Transactional Email extension integrates CiviCRM's non-bulk email
  * with the Mandrill service
- * 
+ *
  * Copyright (C) 2012-2015 JMA Consulting
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Support: https://github.com/JMAConsulting/biz.jmaconsulting.mte/issues
- * 
+ *
  * Contact: info@jmaconsulting.biz
  *          JMA Consulting
  *          215 Spadina Ave, Ste 400
- *          Toronto, ON  
+ *          Toronto, ON
  *          Canada   M5T 2C7
  */
 
@@ -34,9 +34,9 @@ require_once 'mte.civix.php';
  */
 function mte_civicrm_config(&$config) {
   _mte_civix_civicrm_config($config);
-  if ($config->userFramework == 'Joomla' 
+  if ($config->userFramework == 'Joomla'
     && 'civicrm/ajax/mte/callback' == CRM_Utils_Array::value('task', $_REQUEST)) {
-    $_SESSION['mte_temp'] = 1; 
+    $_SESSION['mte_temp'] = 1;
   }
 }
 
@@ -75,12 +75,12 @@ function mte_civicrm_install() {
   else {
     $civiVersion = CRM_Core_BAO_Domain::version();
   }
-  
+
   $jobCLassName = 'CRM_Mailing_DAO_MailingJob';
   if (version_compare('4.4alpha1', $civiVersion) > 0) {
     $jobCLassName = 'CRM_Mailing_DAO_Job';
   }
-  
+
   $changeENUM = FALSE;
   if (version_compare('4.5alpha1', $civiVersion) > 0) {
     $changeENUM = TRUE;
@@ -96,28 +96,28 @@ function mte_civicrm_install() {
 
   // create mailing bounce type
   $mailingBounceType = array(
-    '1' => array ( 
+    '1' => array (
       'name' => 'Mandrill Hard',
       'description' => 'Mandrill hard bounce',
       'hold_threshold' => 1,
     ),
-    '2' => array ( 
+    '2' => array (
       'name' => 'Mandrill Soft',
       'description' => 'Mandrill soft bounce',
       'hold_threshold' => 3,
     ),
-    '3' => array ( 
+    '3' => array (
       'name' => 'Mandrill Spam',
       'description' => 'User marked a transactional email sent via Mandrill as spam',
       'hold_threshold' => 1,
     ),
-    '4' => array ( 
+    '4' => array (
       'name' => 'Mandrill Reject',
       'description' => 'Mandrill rejected delivery to this email address',
       'hold_threshold' => 1,
     ),
   );
-  
+
   foreach ($mailingBounceType as $value) {
     $bounceType = new CRM_Mailing_DAO_BounceType();
     $bounceType->copyValues($value);
@@ -142,10 +142,10 @@ function mte_civicrm_uninstall() {
   else {
     $civiVersion = CRM_Core_BAO_Domain::version();
   }
-  
+
   if (version_compare('4.5alpha1', $civiVersion) > 0) {
-    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_mailing_bounce_type` 
-  CHANGE `name` `name` ENUM( 'AOL', 'Away', 'DNS', 'Host', 'Inactive', 'Invalid', 'Loop', 'Quota', 'Relay', 'Spam', 'Syntax', 'Unknown' ) 
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_mailing_bounce_type`
+  CHANGE `name` `name` ENUM( 'AOL', 'Away', 'DNS', 'Host', 'Inactive', 'Invalid', 'Loop', 'Quota', 'Relay', 'Spam', 'Syntax', 'Unknown' )
     CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Type of bounce';");
   }
   return _mte_civix_civicrm_uninstall();
@@ -163,7 +163,7 @@ function mte_civicrm_enable() {
  * Implementation of hook_civicrm_disable
  */
 function mte_civicrm_disable() {
-  mte_enableDisableNavigationMenu(0);  
+  mte_enableDisableNavigationMenu(0);
   return _mte_civix_civicrm_disable();
 }
 
@@ -201,7 +201,7 @@ function mte_civicrm_alterMailer(&$mailer, $driver, $params) {
   }
   if ($alterMailer == 1) {
     mte_getmailer($mailer, $params);
-  } 
+  }
 }
 
 /*
@@ -215,7 +215,7 @@ function mte_getmailer(&$mailer, &$params = array()) {
   $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mandrill_smtp_settings'
   );
-  
+
   if (CRM_Utils_array::value('is_active', $mailingBackend)) {
     $params['host'] = $mailingBackend['smtpServer'];
     $params['port'] = $mailingBackend['smtpPort'];
@@ -267,7 +267,7 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
   }
 
   if ($context == 'civimail' && CRM_Mte_BAO_Mandrill::$_mailingActivityId) {
-    $activityParams = array( 
+    $activityParams = array(
       'id' => CRM_Mte_BAO_Mandrill::$_mailingActivityId,
       'target_contact_id' => mte_targetContactIds($params),
       'deleteActivityTarget' => FALSE,
@@ -275,7 +275,7 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
     );
   }
   else {
-    $activityParams = array( 
+    $activityParams = array(
       'source_contact_id' => $userID,
       'activity_type_id' => array_search('Mandrill Email Sent', $activityTypes),
       'subject' => CRM_Utils_Array::value('subject', $params) ? $params['subject'] : CRM_Utils_Array::value('Subject', $params),
@@ -284,7 +284,7 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
       'priority_id' => 1,
       'version' => 3,
       'details' => CRM_Utils_Array::value('html', $params, $params['text']),
-      'target_contact_id' => mte_targetContactIds($params), 
+      'target_contact_id' => mte_targetContactIds($params),
     );
     if (!empty($params['job_id'])) {
       $jobCLassName = 'CRM_Mailing_DAO_MailingJob';
@@ -296,10 +296,18 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
   }
 
   $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'mandrill_smtp_settings');
+  if (isset($mailingBackend['activity_includes_mail_body']) && $mailingBackend['activity_includes_mail_body']) {
+    $activityParams['details'] = CRM_Utils_Array::value('html', $params, $params['text']);
+  }
+
+  // This is WIP towards disabling Activity generation, but needs
+  // further work to store the Mandrill-CiviCRM relations in a
+  // different manner before it can proceed? See
+  // https://github.com/JMAConsulting/biz.jmaconsulting.mte/issues/110
   if (in_array(CRM_Mte_BAO_Mandrill::$_mailTypes[$context], $mailingBackend['activities_for'])) {
-    Civi::log()->debug('settings: ' . print_r($mailingBackend, 1));
-    Civi::log()->debug('context: ' . print_r($context, 1));
-    Civi::log()->debug('types: ' . print_r(CRM_Mte_BAO_Mandrill::$_mailTypes, 1));
+    //Civi::log()->debug('settings: ' . print_r($mailingBackend, 1));
+    //Civi::log()->debug('context: ' . print_r($context, 1));
+    //Civi::log()->debug('types: ' . print_r(CRM_Mte_BAO_Mandrill::$_mailTypes, 1));
   }
   $result = civicrm_api('activity', 'create', $activityParams);
 
@@ -333,52 +341,52 @@ function mte_civicrm_alterMailParams(&$params, $context = NULL) {
  * MTE-18 and MTE-38
  * function to disable/enable/delete navigation menu
  *
- * @param integer $action 
+ * @param integer $action
  *
  */
 
 function mte_enableDisableNavigationMenu($action) {
   $domainID = CRM_Core_Config::domainID();
-  
-  if ($action < 2) { 
+
+  if ($action < 2) {
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_option_value cov
        INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
        SET cov.is_active = %1
-       WHERE cog.name IN ('activity_type', 'mandrill_secret') 
-       AND cov.name IN('Mandrill Email Bounce', 'Mandrill Email Click', 'Mandrill Email Open', 'Mandrill Email Sent','Secret Code')", 
+       WHERE cog.name IN ('activity_type', 'mandrill_secret')
+       AND cov.name IN('Mandrill Email Bounce', 'Mandrill Email Click', 'Mandrill Email Open', 'Mandrill Email Sent','Secret Code')",
       array(
         1 => array($action, 'Integer'),
       )
-    ); 
-    
+    );
+
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_option_group
        SET is_active = %1
-       WHERE name  = 'mandrill_secret'", 
+       WHERE name  = 'mandrill_secret'",
       array(
         1 => array($action, 'Integer')
       )
-    ); 
-    
+    );
+
     CRM_Core_DAO::executeQuery(
-      "UPDATE civicrm_navigation SET is_active = %2 WHERE name = 'mandrill_smtp_settings' AND domain_id = %1", 
+      "UPDATE civicrm_navigation SET is_active = %2 WHERE name = 'mandrill_smtp_settings' AND domain_id = %1",
       array(
         1 => array($domainID, 'Integer'),
         2 => array($action, 'Integer')
       )
-    ); 
+    );
   }
   else {
     CRM_Core_DAO::executeQuery(
-      "DELETE FROM civicrm_navigation  WHERE name = 'mandrill_smtp_settings' AND domain_id = %1", 
+      "DELETE FROM civicrm_navigation  WHERE name = 'mandrill_smtp_settings' AND domain_id = %1",
       array(
         1 => array($domainID, 'Integer')
       )
     );
   }
 }
- 
+
 /**
  * Implementation of hook_civicrm_buildForm
  */
@@ -387,7 +395,7 @@ function mte_civicrm_buildForm($formName, &$form) {
     $values = $form->getVar('_values');
 
     if (CRM_Utils_Array::value('name', $values) != 'Secret Code') {
-      return FALSE; 
+      return FALSE;
     }
     $form->add('text',
       'value',
@@ -396,10 +404,10 @@ function mte_civicrm_buildForm($formName, &$form) {
       TRUE
     );
   }
-} 
+}
 
 /*
- * function to check if Mandril enabled for 
+ * function to check if Mandril enabled for
  * Civimail v/s Transactional mail
  *
  */
@@ -408,13 +416,13 @@ function mte_checkSettings($context) {
   if ($context == 'civimail') {
     $usedFor = 2;
   }
-  
+
   $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mandrill_smtp_settings'
   );
-  
-  if (CRM_Utils_array::value('is_active', $mailingBackend) && 
-    array_key_exists('used_for', $mailingBackend) 
+
+  if (CRM_Utils_array::value('is_active', $mailingBackend) &&
+    array_key_exists('used_for', $mailingBackend)
     && !empty($mailingBackend['used_for'][$usedFor])
   ) {
     return TRUE;
@@ -433,15 +441,15 @@ function mte_checkSettings($context) {
 function mte_targetContactIds($params) {
   $emails = array_merge(
     explode(
-      ',', 
+      ',',
       $params['toEmail']
-    ), 
+    ),
     explode(
-      ',', 
+      ',',
       CRM_Utils_Array::value('cc', $params, '')
-    ), 
+    ),
     explode(
-      ',', 
+      ',',
       CRM_Utils_Array::value('bcc', $params, '')
     )
   );
@@ -451,7 +459,7 @@ function mte_targetContactIds($params) {
     if (!empty($matches[0])) {
       $targetContacts = CRM_Mte_BAO_Mandrill::retrieveEmailContactId(trim($matches[0]));
       $targetContactIds = array_merge(
-        $targetContactIds, 
+        $targetContactIds,
         CRM_Utils_Array::value('contactIds', $targetContacts, array())
       );
     }
@@ -464,7 +472,7 @@ function mte_targetContactIds($params) {
  */
 function mte_civicrm_alterReportVar($varType, &$var, &$object) {
   $instanceValue = $object->getVar('_instanceValues');
-  if (!empty($instanceValue) && 
+  if (!empty($instanceValue) &&
     in_array(
       $instanceValue['report_id'],
       array(
@@ -486,10 +494,10 @@ function mte_civicrm_alterReportVar($varType, &$var, &$object) {
           'title' => 'mailing id',
         );
         $var->_select .= ' , civicrm_mandrill_activity.activity_id as civicrm_mandrill_activity_id, mailing_civireport.id as civicrm_mailing_id ';
-      
+
         $from = $var->getVar('_from');
         $from .= ' LEFT JOIN civicrm_mandrill_activity ON civicrm_mailing_event_queue.id = civicrm_mandrill_activity.mailing_queue_id';
-        $var->setVar('_from', $from); 
+        $var->setVar('_from', $from);
         if ($instanceValue['report_id'] == 'Mailing/opened') {
           $var->_columnHeaders['opened_count'] = array(
             'type' => 1,
@@ -500,7 +508,7 @@ function mte_civicrm_alterReportVar($varType, &$var, &$object) {
         }
       }
     }
-    if ($varType == 'rows') { 
+    if ($varType == 'rows') {
       $mail = new CRM_Mailing_DAO_Mailing();
       $mail->subject = "***All Transactional Emails***";
       $mail->url_tracking = TRUE;
@@ -513,20 +521,20 @@ function mte_civicrm_alterReportVar($varType, &$var, &$object) {
           if (!empty($value['civicrm_mandrill_activity_id']) && $mail->id == $value['civicrm_mailing_id']) {
             $var[$key]['civicrm_mailing_mailing_name_link'] = CRM_Utils_System::url(
               'civicrm/activity',
-              "reset=1&action=view&cid={$value['civicrm_contact_id']}&id={$value['civicrm_mandrill_activity_id']}"              
+              "reset=1&action=view&cid={$value['civicrm_contact_id']}&id={$value['civicrm_mandrill_activity_id']}"
             );
-            $var[$key]['civicrm_mailing_mailing_name_hover'] = ts('View Transactional Email');          
+            $var[$key]['civicrm_mailing_mailing_name_hover'] = ts('View Transactional Email');
           }
         }
         unset($object->_columnHeaders['civicrm_mandrill_activity_id'], $object->_columnHeaders['civicrm_mailing_id']);
-      }    
+      }
     }
   }
 }
 
 /*
  * function to create Mailing Queue when a message is about to send
- * 
+ *
  * @param string $mandrillHeader  -- Mandrill Header
  * @param string $toEmail         -- To Email Address
  *
@@ -562,30 +570,13 @@ function mte_createQueue(&$mandrillHeader, $toEmail) {
 }
 
 /**
- * Implementation of hook_civicrm_postEmailSend
+ * Implements hook_civicrm_postEmailSend.
+ *
+ * Only called for transactional emails?
  */
 function mte_civicrm_postEmailSend(&$params) {
   static $activities_for = array();
-  Civi::log()->debug(print_r($params, 1));
   if (!empty($params['mandrillHeader'])) {
-    // This is mte_checkSettings().
-//      $usedFor = 1;
-//      if ($context == 'civimail') {
-//          $usedFor = 2;
-//      }
-//
-//      $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-//        'mandrill_smtp_settings'
-//      );
-//
-//      if (CRM_Utils_array::value('is_active', $mailingBackend) &&
-//        array_key_exists('used_for', $mailingBackend)
-//        && !empty($mailingBackend['used_for'][$usedFor])
-//      ) {
-//          return TRUE;
-//      }
-//      return FALSE;
-
     $header = explode(CRM_Core_Config::singleton()->verpSeparator, $params['mandrillHeader']);
     $params = array(
       'job_id' => $header[2],
